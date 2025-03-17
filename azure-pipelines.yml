@@ -1,23 +1,18 @@
 trigger:
   branches:
     include:
-      - main  # Trigger the pipeline on changes to the 'main' branch
+      - main  # Trigger on the main branch
 
 pool:
-  vmImage: 'ubuntu-latest'  # The environment for running the pipeline (Ubuntu VM in this case)
+  vmImage: 'ubuntu-latest'  # Use the latest Ubuntu image
 
 steps:
-  - task: UseNode@2  # Use Node.js task to specify Node.js version
+  - task: UseNode@1  # Use Node.js task version 1
     inputs:
-      versionSpec: '16.x'
-      addToPath: true
+      versionSpec: '16.x'  # Specify the Node.js version
+      addToPath: true  # Add Node.js to the system PATH
 
   - script: |
-      npm install  # Install the dependencies
+      npm install  # Install dependencies
       npm test      # Run tests
     displayName: 'Install dependencies and run tests'
-
-  - task: PublishBuildArtifacts@1  # Publish artifacts task (optional, but useful for storing build outputs)
-    inputs:
-      artifactName: 'drop'
-      publishLocation: 'Container'
