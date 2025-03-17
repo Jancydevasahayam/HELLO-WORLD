@@ -1,18 +1,31 @@
 trigger:
   branches:
     include:
-      - main  # Trigger on the main branch
+      - main  # Trigger the pipeline on changes to the 'main' branch
 
 pool:
-  vmImage: 'ubuntu-latest'  # Use the latest Ubuntu image
+  vmImage: 'ubuntu-latest'  # Use the latest Ubuntu VM image for the build environment
 
 steps:
-  - task: UseNode@1  # Use Node.js task version 1
-    inputs:
-      versionSpec: '16.x'  # Specify the Node.js version
-      addToPath: true  # Add Node.js to the system PATH
+  # Step 1: Checkout the code from the repository
+  - task: Checkout@1
 
-  - script: |
-      npm install  # Install dependencies
-      npm test      # Run tests
-    displayName: 'Install dependencies and run tests'
+  # Step 2: Set up Maven environment
+  - task: UseMaven@3  # Use the Maven task to set up Maven
+
+    inputs:
+      mavenVersionOption: 'Default'  # You can specify a custom version if needed
+
+  # Step 3: Build the project using Maven
+  - script: mvn clean install  # Clean the project and run the Maven build
+    displayName: 'Build with Maven'
+
+  # Step 4: Run tests with Maven (optional, if your project includes tests)
+  - script: mvn test  # Run tests using Maven
+    displayName: 'Run Tests'
+
+  # Step 5: Publish build artifacts (optional)
+  - task: PublishBuildArtifacts@1
+    inputs:
+      artifactName: 'drop'  # Name for the build artifact
+      publishLocation: 'Container'  # Artifact storage location (you can choose 'FileShare' or 'Container')
